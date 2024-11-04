@@ -8,7 +8,7 @@ cd path\to\your\venv
 call .\Scripts\activate.bat
 
 :: Specify Python IO encoding.
-set PYTHONIOENCODING=utf-16
+set PYTHONIOENCODING=utf-8
 
 :: ------------------ Date and Time Modifier ------------------------
 
