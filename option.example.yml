@@ -1,0 +1,34 @@
+client:
+  cache: null
+  domain: []
+  impl: api
+  postman:
+    meta_data:
+      headers: null
+      impersonate: chrome110
+      proxies: {}
+    type: cffi
+  retry_times: 5
+dir_rule:
+  base_dir: "Path\\to\\your\\download\\folder" # "B:\\manga\\韩漫"
+  rule: Bd_Afolder_Atitle_Pindextitle
+download:
+  cache: true
+  image:
+    decode: true
+    suffix: .jpg
+  threading:
+    image: 30
+    photo: 12
+log: true
+plugins:
+  valid: log
+  after_init:
+    - plugin: login # 登录插件
+      kwargs:
+        username: username
+        password: password
+    - plugin: my_find_update # 只下载新章插件
+      kwargs:
+        json_path: "update_list.json" #Json list to store the manga progress
+        download_all: false # true 的话会重新下载所有album至标明章节， false 的话就只下载未完结新章
