@@ -129,3 +129,6 @@ dmypy.json
 option.yml
 run_script.bat
 update_list.json
+
+# VSCode setting
+.vscode/
