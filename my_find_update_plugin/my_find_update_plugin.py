@@ -99,14 +99,37 @@ class MyFindUpdatePlugin(FindUpdatePlugin):
                     album=album,
                     downloader=self,
                 )
+
+            @property
+            def all_success(self) -> bool:
+                """
+                是否成功下载了全部图片
+
+                该属性需要等到downloader的全部download_xxx方法完成后才有意义。
+                覆盖原函数，这样即使使用filter也可以返回true
+                """
+                if len(self.download_failed_list) != 0:
+                    return False
+
+                return True
+            
             def after_album(self, album: JmAlbumDetail):
                 super().after_album(album)
-                if update_list['UpdateList'][album.album_id]['photo_id'] != album[-1].photo_id: # Update newest chapter in json date
-                    update_list['UpdateList'][album.album_id]['photo_id'] = album[-1].photo_id
-                    update_list['LastUpdate'] += f'{album.name} 更新至 {album[-1].index}-{album[-1].name}\n'
-                    jm_log('after_album,',f'{album.name} 更新至 {album[-1].index}-{album[-1].name}')
-                # 更新漫画为非第一次下载
-                update_list['UpdateList'][album.album_id]['first_download'] = False
+                if not self.all_success: #记录下失败的章节图片
+                    for failed_image in self.download_failed_list:
+                        update_list['FailedList'][f'{album.album_id}-{album.name}-{failed_image[0].aid}-{failed_image[0].filename}'] = failed_image[0].download_url
+                else:  #只有更新成功了才update json数据库
+                    update_list['UpdateList'][album.album_id]['latest_title'] = f'{album[-1].index}-{album[-1].name}'
+                    # 如果发现完结标签，将作品标为完结
+                    if not update_list['UpdateList'][album.album_id]['completed'] and ('完結' in album.tags or '完结' in album.tags):
+                        update_list['UpdateList'][album.album_id]['completed'] = True
+                    
+                    if update_list['UpdateList'][album.album_id]['photo_id'] != album[-1].photo_id: # Update newest chapter in json date
+                        update_list['UpdateList'][album.album_id]['photo_id'] = album[-1].photo_id
+                        update_list['LastUpdate'] += f'{album.name} 更新至 {album[-1].index}-{album[-1].name}\n'
+                        jm_log('after_album,',f'{album.name} 更新至 {album[-1].index}-{album[-1].name}')
+                    # 更新漫画为非第一次下载
+                    update_list['UpdateList'][album.album_id]['first_download'] = False
                 self.option.call_all_plugin(
                     'after_album',
                     album=album,
