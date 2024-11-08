@@ -110,7 +110,6 @@ class MyFindUpdatePlugin(FindUpdatePlugin):
                 """
                 if len(self.download_failed_list) != 0:
                     return False
-
                 return True
             
             def after_album(self, album: JmAlbumDetail):
