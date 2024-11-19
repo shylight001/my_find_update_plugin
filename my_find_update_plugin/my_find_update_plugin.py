@@ -1,7 +1,7 @@
 # 1. 自定义plugin类
 from jmcomic import * #JmOptionPlugin, JmModuleConfig, FindUpdatePlugin, JmModuleConfig
 from my_find_update_plugin.json_helper import load_json, save_json
-
+from datetime import datetime
 update_list = dict()
 
 
@@ -31,6 +31,9 @@ class MyFindUpdatePlugin(FindUpdatePlugin):
                 album_dict[index] =  album['photo_id']
         self.download_album_with_find_update(album_dict or {})
 
+        formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        update_list["UpdateLog"][formatted_datetime] = update_list['LastUpdate']
+        
         save_json(json_path, update_list)
         jm_log('MyFindUpdateInvoke',f'保存更新后的json data')
         
@@ -110,7 +113,6 @@ class MyFindUpdatePlugin(FindUpdatePlugin):
                 """
                 if len(self.download_failed_list) != 0:
                     return False
-
                 return True
             
             def after_album(self, album: JmAlbumDetail):
